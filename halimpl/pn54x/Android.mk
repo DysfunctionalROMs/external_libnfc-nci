@@ -12,9 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ifneq ($(BOARD_NFC_HAL_SUFFIX),)
+    HAL_SUFFIX := pn54x.$(BOARD_NFC_HAL_SUFFIX)
+else
+    HAL_SUFFIX := pn54x.default
+endif
+
+ifeq ($(BOARD_NFC_DEVICE),)
+    NFC_DEVICE := "/dev/pn544"
+else
+    NFC_DEVICE := $(BOARD_NFC_DEVICE)
+endif
+
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
-LOCAL_MODULE := nfc_nci.$(TARGET_DEVICE)
+LOCAL_MODULE := nfc_nci.$(HAL_SUFFIX)
 LOCAL_MODULE_RELATIVE_PATH := hw
 LOCAL_SRC_FILES := $(call all-subdir-c-files)  $(call all-subdir-cpp-files)
 LOCAL_SHARED_LIBRARIES := liblog libcutils libhardware_legacy libdl libhardware
@@ -41,11 +53,21 @@ LOCAL_CFLAGS += -DPN548C2=2
 endif
 
 #### Select the CHIP ####
+ifeq ($(NFC_NXP_CHIP_TYPE),PN547C2)
+LOCAL_CFLAGS += -DNFC_NXP_CHIP_TYPE=PN547C2
+else
 LOCAL_CFLAGS += -DNFC_NXP_CHIP_TYPE=PN548C2
+endif
+
+ifeq ($(BOARD_NFC_CHIPSET),pn547)
+    LOCAL_CFLAGS += -DNFC_NXP_CHIP_TYPE=PN547C2
+endif
 
 LOCAL_CFLAGS += -DANDROID \
         -DNXP_UICC_ENABLE -DNXP_HW_SELF_TEST
 LOCAL_CFLAGS += -DNFC_NXP_HFO_SETTINGS=FALSE
 #LOCAL_CFLAGS += -DFELICA_CLT_ENABLE
+
+LOCAL_CFLAGS += -DNXP_NFC_DEVICE="\"$(NFC_DEVICE)\""
 
 include $(BUILD_SHARED_LIBRARY)
