@@ -1,3 +1,5 @@
+ifneq ($(strip $(TARGET_USES_NQ_NFC)),true)
+
 LOCAL_PATH:= $(call my-dir)
 NFA := src/nfa
 NFC := src/nfc
@@ -68,3 +70,4 @@ include $(BUILD_SHARED_LIBRARY)
 
 ######################################
 include $(call all-makefiles-under,$(LOCAL_PATH))
+endif
